@@ -62,14 +62,12 @@ public class MockedLocationService extends Service {
     protected void startMockedService(double longitude, double latitude, double longitudeDistance, double latitudeDistance, long mockMilli, int maxTime) {
         try {
             providers.clear();
-            // Only use GPS provider for more stable spoofing
+            // Initialize both GPS and network providers
             providers.add(new MockedLocationProvider(LocationManager.GPS_PROVIDER, this));
+            providers.add(new MockedLocationProvider(LocationManager.NETWORK_PROVIDER, this));
             
-            // Disable other location providers
+            // Disable fused provider if enabled
             LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-                lm.setTestProviderEnabled(LocationManager.NETWORK_PROVIDER, false);
-            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && lm.isProviderEnabled(LocationManager.FUSED_PROVIDER)) {
                 lm.setTestProviderEnabled(LocationManager.FUSED_PROVIDER, false);
             }
@@ -111,30 +109,30 @@ public class MockedLocationService extends Service {
 
         @Override
         public void run() {
-            // Create location with small random variation
+            // Create location without variation
             Location value = new Location(LocationManager.GPS_PROVIDER);
-            value.setLongitude(longitude + getRandomVariation());
-            value.setLatitude(latitude + getRandomVariation());
+            value.setLongitude(longitude);
+            value.setLatitude(latitude);
             value.setTime(System.currentTimeMillis());
             value.setElapsedRealtimeNanos(SystemClock.elapsedRealtimeNanos());
             value.setAccuracy(5.0f);
             
-            // Only update if location changed significantly
-            if (lastLocation == null || 
-                value.distanceTo(lastLocation) > 5.0) { // ~5 meters
-                mockedLocation.postValue(value);
-                for (MockedLocationProvider prov : providers)
-                    prov.pushLocation(value.getLatitude(), value.getLongitude());
-                lastLocation = value;
-            }
+            // Always push location updates every second
+            mockedLocation.postValue(value);
+            for (MockedLocationProvider prov : providers)
+                prov.pushLocation(value.getLatitude(), value.getLongitude());
+            lastLocation = value;
             ++currentTimes;
             if (maxLocationTimes != 0 && maxLocationTimes == currentTimes) {
                 this.cancel();
                 stopSelf();
                 mockState.postValue(MockState.NOT_MOCKED);
             }
-            latitude += latitudeMockedDistance;
-            longitude += longitudeMockedDistance;
+            // Only increment if movement is needed
+            if (longitudeMockedDistance != 0 || latitudeMockedDistance != 0) {
+                latitude += latitudeMockedDistance;
+                longitude += longitudeMockedDistance;
+            }
         }
     }
 
