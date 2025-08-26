@@ -23,12 +23,17 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -40,10 +45,17 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
-
 
 public class MainActivity extends AppCompatActivity implements ServiceConnection {
 
@@ -92,7 +104,16 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         context = getApplicationContext();
         webView = findViewById(R.id.webView0);
-        WebAppInterface webAppInterface = new WebAppInterface(this);
+
+        // **Tambahkan WebAppInterface**
+        WebAppInterface webAppInterface = new WebAppInterface();
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebViewClient(new WebViewClient());
+        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        webView.getSettings().setDomStorageEnabled(true);
+        webView.getSettings().setDatabaseEnabled(true);
+        webView.addJavascriptInterface(webAppInterface, "Android");
 
         buttonApplyStop = findViewById(R.id.button_applyStop);
         MaterialButton buttonSettings = findViewById(R.id.button_settings);
@@ -107,11 +128,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             Intent myIntent = new Intent(getBaseContext(), MoreActivity.class);
             startActivity(myIntent);
         });
-
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebChromeClient(new WebChromeClient());
-        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-        webView.addJavascriptInterface(webAppInterface, "Android");
 
         try {
             PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -136,9 +152,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 .build()
                 .toString());
 
+        // TextWatcher untuk lat/lng tetap sama
         editTextLat.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
+            @Override public void afterTextChanged(Editable s) {
                 if (!editTextLat.getText().toString().isEmpty() && !editTextLat.getText().toString().equals("-")) {
                     if (srcChange != CHANGE_FROM_MAP) {
                         try {
@@ -150,19 +166,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     }
                 }
             }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
         });
 
         editTextLng.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
+            @Override public void afterTextChanged(Editable s) {
                 if (!editTextLng.getText().toString().isEmpty() && !editTextLng.getText().toString().equals("-")) {
                     if (srcChange != CHANGE_FROM_MAP) {
                         try {
@@ -174,17 +183,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     }
                 }
             }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
         });
 
-        //2do check running on start?
         if (endTime > System.currentTimeMillis()) {
             changeButtonToStop();
         } else {
@@ -194,6 +196,46 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     }
 
+    // ===================== WebAppInterface =====================
+    public class WebAppInterface {
+
+        @JavascriptInterface
+        public void searchAddress(String query) {
+            new Thread(() -> {
+                try {
+                    String apiUrl = "https://nominatim.openstreetmap.org/search?q=" +
+                            URLEncoder.encode(query, "UTF-8") +
+                            "&format=json&limit=1";
+
+                    URL url = new URL(apiUrl);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty("User-Agent", "FakeTraveler/1.0"); // wajib untuk Nominatim
+
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        response.append(line);
+                    }
+                    in.close();
+
+                    String jsonResult = response.toString();
+
+                    // Kirim balik ke JS
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                            // jsonResult adalah hasil JSON dari API
+                            webView.evaluateJavascript("handleSearchResult(" + JSONObject.quote(jsonResult) + ")", null);
+                        });
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    }
+
+    // ===================== Sisanya tetap sama =====================
     @Override
     protected void onResume() {
         super.onResume();
@@ -205,6 +247,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     public void onDestroy() {
         super.onDestroy();
     }
+
 
     /**
      * Check and (re-)initialize shared preferences.
@@ -461,7 +504,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         }
     }
 
-    public enum SourceChange {
-        NONE, LOAD, CHANGE_FROM_EDITTEXT, CHANGE_FROM_MAP
-    }
+    public enum SourceChange { NONE, LOAD, CHANGE_FROM_EDITTEXT, CHANGE_FROM_MAP }
+
 }

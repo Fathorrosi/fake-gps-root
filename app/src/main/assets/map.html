@@ -1,18 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <title>Mock Position</title>
-
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="polyfill.js"></script>
-
     <link rel="stylesheet" href="leaflet.css">
     <script src="leaflet.js"></script>
     <script src="leaflet-providers.js"></script>
-    <script src="search.js"></script>
     <style>
         html, body {
             height: 100%;
@@ -21,8 +17,8 @@
             flex-direction: column;
         }
         #search {
-            padding: 10px; /* Add some padding around the input */
-            box-sizing: border-box; /* Include padding in element's total width and height */
+            padding: 10px;
+            box-sizing: border-box;
         }
         #address_input {
             font-size: 16pt;
@@ -62,5 +58,28 @@
 <div id='map'></div>
 
 <script src="init.js"></script>
+
+<script>
+function searchForAddress() {
+    const query = document.getElementById("address_input").value;
+    if (query && typeof Android !== "undefined" && Android.searchAddress) {
+        Android.searchAddress(query);  // panggil fungsi di native Android
+    } else {
+        alert("Android bridge not available");
+    }
+}
+
+// dipanggil dari native setelah selesai request
+function handleSearchResult(resultStr) {
+    const result = JSON.parse(resultStr);
+    if (result.length > 0) {
+        const loc = result[0];
+        const lat = parseFloat(loc.lat);
+        const lng = parseFloat(loc.lon);
+        setOnMap(lat, lng);
+    }
+}
+
+</script>
 </body>
 </html>
