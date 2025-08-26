@@ -69,6 +69,10 @@ function handleSearchResult(resultStr) {
             const lat = parseFloat(loc.lat);
             const lng = parseFloat(loc.lon);
             setOnMap(lat, lng);
+            
+            // Also trigger onMapClick to update coordinates in Android app
+            const mapEvent = { latlng: L.latLng(lat, lng) };
+            onMapClick(mapEvent);
         }
     } catch (error) {
         console.error("Error parsing search result:", error);
