@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         WebAppInterface webAppInterface = new WebAppInterface(this);
 
         buttonApplyStop = findViewById(R.id.button_applyStop);
-        MaterialButton buttonSettings = findViewById(R.id.button_settings);
+//        MaterialButton buttonSettings = findViewById(R.id.button_settings);
         editTextLat = findViewById(R.id.editTextLat);
         editTextLng = findViewById(R.id.editTextLng);
 
@@ -101,10 +101,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             Intent intent = new Intent(this, MockedLocationService.class);
             bindService(intent, this, BIND_AUTO_CREATE);
         });
-        buttonSettings.setOnClickListener(view -> {
-            Intent myIntent = new Intent(getBaseContext(), MoreActivity.class);
-            startActivity(myIntent);
-        });
+//        buttonSettings.setOnClickListener(view -> {
+//            Intent myIntent = new Intent(getBaseContext(), MoreActivity.class);
+//            startActivity(myIntent);
+//        });
 
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebChromeClient(new WebChromeClient());
