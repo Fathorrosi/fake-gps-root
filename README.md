@@ -3,7 +3,7 @@
 
 Fake where your phone is located (Mock location for Android).
 
-Sometimes you need to fake the location of your device (for privacy or to test an app). Fake Traveler provides you a map to select the location where you want your phone to be.
+Sometimes you need to fake the location of your device (for privacy or to test an app). Navtrack provides you a map to select the location where you want your phone to be.
 
 <a href="https://f-droid.org/app/cl.coders.faketraveler"><img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="100"></a>
 
@@ -27,7 +27,7 @@ you are mocking.
 
 ## Requirements?
 
-In order to work, you need to allow Fake Traveler to mock locations. You have to [enable Developer options](https://developer.android.com/studio/debug/dev-options?hl=en-419) and select this app in "Settings/System/Developer options/Select mock location app" option.
+In order to work, you need to allow Navtrack to mock locations. You have to [enable Developer options](https://developer.android.com/studio/debug/dev-options?hl=en-419) and select this app in "Settings/System/Developer options/Select mock location app" option.
 
 <div style="display:flex;">
 <img alt="How to set up mock locations step 1" src="screenshots/mock_location_1.png" width="30%">

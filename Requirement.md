@@ -1,4 +1,4 @@
-# Fake Traveler (Root + AppOps Spoofing)
+# Navtrack (Root + AppOps Spoofing)
 
 ## Tujuan
 Aplikasi Android dengan package name `cl.coders.faketraveler` yang dapat melakukan spoof lokasi ke seluruh sistem:
