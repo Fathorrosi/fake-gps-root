@@ -60,26 +60,21 @@
 <script src="init.js"></script>
 
 <script>
-function searchForAddress() {
-    const query = document.getElementById("address_input").value;
-    if (query && typeof Android !== "undefined" && Android.searchAddress) {
-        Android.searchAddress(query);  // panggil fungsi di native Android
-    } else {
-        alert("Android bridge not available");
-    }
-}
-
 // dipanggil dari native setelah selesai request
 function handleSearchResult(resultStr) {
-    const result = JSON.parse(resultStr);
-    if (result.length > 0) {
-        const loc = result[0];
-        const lat = parseFloat(loc.lat);
-        const lng = parseFloat(loc.lon);
-        setOnMap(lat, lng);
+    try {
+        const result = JSON.parse(resultStr);
+        if (result.length > 0) {
+            const loc = result[0];
+            const lat = parseFloat(loc.lat);
+            const lng = parseFloat(loc.lon);
+            setOnMap(lat, lng);
+        }
+    } catch (error) {
+        console.error("Error parsing search result:", error);
     }
 }
-
 </script>
+
 </body>
 </html>
