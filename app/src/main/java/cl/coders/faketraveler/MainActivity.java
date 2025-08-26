@@ -221,8 +221,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     }
 
     protected void applyLocation() {
-        if (!hasRootAccess() && !executeAppOpsCommand()) {
-            toast(R.string.MainActivity_EnableMockLocation);
+        // Check if device has root access
+        if (!hasRootAccess()) {
+            toast("Root access required! This app needs root privileges to mock location without developer options.");
+            return;
+        }
+
+        // Execute AppOps command to grant mock location permission
+        if (!executeAppOpsCommand()) {
+            toast("Failed to grant mock location permission via AppOps. Please check root access.");
             return;
         }
 
@@ -371,15 +378,25 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     private boolean executeAppOpsCommand() {
         try {
-            Process process = Runtime.getRuntime().exec("su");
-            DataOutputStream os = new DataOutputStream(process.getOutputStream());
-            os.writeBytes("appops set " + getPackageName() + " android:mock_location allow\n");
-            os.writeBytes("exit\n");
-            os.flush();
-            os.close();
-            process.waitFor();
-            Thread.sleep(500);
-            return process.exitValue() == 0;
+            // Use the exact command from requirement: su -c "appops set cl.coders.faketraveler android:mock_location allow"
+            Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", "appops set " + getPackageName() + " android:mock_location allow"});
+            
+            // Wait for the process to complete
+            int exitCode = process.waitFor();
+            
+            // Also try the alternative method with direct su command
+            if (exitCode != 0) {
+                Process process2 = Runtime.getRuntime().exec("su");
+                DataOutputStream os = new DataOutputStream(process2.getOutputStream());
+                os.writeBytes("appops set " + getPackageName() + " android:mock_location allow\n");
+                os.writeBytes("exit\n");
+                os.flush();
+                os.close();
+                exitCode = process2.waitFor();
+            }
+            
+            Log.d(TAG, "AppOps command executed with exit code: " + exitCode);
+            return exitCode == 0;
         } catch (Exception e) {
             Log.e(TAG, "Failed to execute AppOps command", e);
             return false;

@@ -13,10 +13,10 @@
     <!--  Strings from MainActivity.java  -->
     <string name="MainActivity_NoLatLong">No latitude/longitude values. Long press in the map where you want to be located.</string>
     <string name="MainActivity_MockApplied">Mocked location applied.</string>
-    <string name="MainActivity_MockNotApplied">Mocked location not applied. You must enable mock location in developer settings!</string>
+    <string name="MainActivity_MockNotApplied">Mocked location not applied. Root access required!</string>
     <string name="MainActivity_MockLocRunning">Mocking location service running.</string>
     <string name="MainActivity_MockStopped">Mocking stopped.</string>
-    <string name="MainActivity_EnableMockLocation">Please enable mock locations in Developer Options and select this app as mock location app</string>
+    <string name="MainActivity_EnableMockLocation">Root access required! This app needs root privileges to mock location without developer options.</string>
 
     <!--  Strings from activity_more.xml layout  -->
     <string name="ActivityMore_HowToTittle">How to use it?</string>
@@ -26,7 +26,7 @@
     <string name="ActivityMore_SourceCode">Source code available in https://github.com/mcastillof/FakeTraveler</string>
     <string name="ActivityMore_Bugs">Report bugs to https://github.com/mcastillof/FakeTraveler/issues</string>
     <string name="ActivityMore_IconLicense">The launcher icon was created by @ArtistDev44 - thank you very much for your work!</string>
-    <string name="ActivityMore_HowToInstructions">Long press where you want to be located in the map and press Apply button. The location will be mocked one or more times accordingly to configuration below. While the mock is running, you can change the location just by long pressing where you to be. To stop mocking the location, press the Stop button. Note: you must enable Navtrack as mock location app in Developers options.</string>
+    <string name="ActivityMore_HowToInstructions">Long press where you want to be located in the map and press Apply button. The location will be mocked one or more times accordingly to configuration below. While the mock is running, you can change the location just by long pressing where you to be. To stop mocking the location, press the Stop button. Note: This app requires root access to mock location without developer options.</string>
     <string name="ActivityMore_DMockLatLon">Mock movement? (1&#160;/&#160;1 000 000°, 0&#160;=&#160;no)</string>
     <string name="ActivityMore_MapProvider">Map Provider (e.g., \'OpenStreetMap\')</string>
     <string name="ActivityMore_MapProviderInfo">Requires restart - a list of possible values can be found here: https://leaflet-extras.github.io/leaflet-providers/preview/</string>
