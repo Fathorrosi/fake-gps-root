@@ -1,6 +1,6 @@
-package cl.coders.faketraveler;
+package cl.coders.navtrackapp;
 
-import static cl.coders.faketraveler.MainActivity.sharedPrefKey;
+import static cl.coders.navtrackapp.MainActivity.sharedPrefKey;
 
 import android.content.Context;
 import android.content.SharedPreferences;

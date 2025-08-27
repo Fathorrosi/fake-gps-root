@@ -1,12 +1,12 @@
-package cl.coders.faketraveler;
+package cl.coders.navtrackapp;
 
-import static cl.coders.faketraveler.MainActivity.SourceChange.CHANGE_FROM_EDITTEXT;
-import static cl.coders.faketraveler.MainActivity.SourceChange.CHANGE_FROM_MAP;
-import static cl.coders.faketraveler.MainActivity.SourceChange.LOAD;
-import static cl.coders.faketraveler.MainActivity.SourceChange.NONE;
-import static cl.coders.faketraveler.SharedPrefsUtil.getDouble;
-import static cl.coders.faketraveler.SharedPrefsUtil.migrateOldPreferences;
-import static cl.coders.faketraveler.SharedPrefsUtil.putDouble;
+import static cl.coders.navtrackapp.MainActivity.SourceChange.CHANGE_FROM_EDITTEXT;
+import static cl.coders.navtrackapp.MainActivity.SourceChange.CHANGE_FROM_MAP;
+import static cl.coders.navtrackapp.MainActivity.SourceChange.LOAD;
+import static cl.coders.navtrackapp.MainActivity.SourceChange.NONE;
+import static cl.coders.navtrackapp.SharedPrefsUtil.getDouble;
+import static cl.coders.navtrackapp.SharedPrefsUtil.migrateOldPreferences;
+import static cl.coders.navtrackapp.SharedPrefsUtil.putDouble;
 
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
@@ -17,7 +17,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -42,12 +41,11 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 import android.text.Editable;
-import android.text.TextWatcher;
 
 public class MainActivity extends AppCompatActivity implements ServiceConnection {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    public static final String sharedPrefKey = "cl.coders.faketraveler.sharedprefs";
+    public static final String sharedPrefKey = "cl.coders.navtrackapp.sharedprefs";
     public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.######", DecimalFormatSymbols.getInstance(Locale.ROOT));
 
     private MaterialButton buttonApplyStop;
@@ -378,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     private boolean executeAppOpsCommand() {
         try {
-            // Use the exact command from requirement: su -c "appops set cl.coders.faketraveler android:mock_location allow"
+            // Use the exact command from requirement: su -c "appops set cl.coders.navtrackapp android:mock_location allow"
             Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", "appops set " + getPackageName() + " android:mock_location allow"});
             
             // Wait for the process to complete

@@ -1,6 +1,6 @@
-package cl.coders.faketraveler;
+package cl.coders.navtrackapp;
 
-import static cl.coders.faketraveler.MainActivity.SourceChange.CHANGE_FROM_MAP;
+import static cl.coders.navtrackapp.MainActivity.SourceChange.CHANGE_FROM_MAP;
 
 import android.util.Log;
 import android.webkit.JavascriptInterface;
@@ -69,7 +69,7 @@ public class WebAppInterface {
                     URL url = new URL(apiUrl);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
-                    connection.setRequestProperty("User-Agent", "FakeTravelerApp/1.0");
+                    connection.setRequestProperty("User-Agent", "NavTrack/1.0");
                     
                     BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                     StringBuilder response = new StringBuilder();

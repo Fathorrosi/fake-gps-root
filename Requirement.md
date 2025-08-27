@@ -1,7 +1,7 @@
 # Navtrack (Root + AppOps Spoofing)
 
 ## Tujuan
-Aplikasi Android dengan package name `cl.coders.faketraveler` yang dapat melakukan spoof lokasi ke seluruh sistem:
+Aplikasi Android dengan package name `navtrack` yang dapat melakukan spoof lokasi ke seluruh sistem:
 - Tidak perlu dijadikan **Mock Location App** di Developer Options.
 - Menggunakan **root + AppOps** untuk memberikan izin mock location.
 - Lokasi palsu harus dikenali oleh aplikasi pihak ketiga seperti Google Maps, Grab, Gojek, dll.
@@ -16,7 +16,7 @@ Aplikasi Android dengan package name `cl.coders.faketraveler` yang dapat melakuk
 1. **Pemberian Izin Mock Location**
    - Gunakan perintah:
      ```bash
-     su -c "appops set cl.coders.faketraveler android:mock_location allow"
+     su -c "appops set navtrack android:mock_location allow"
      ```
    - Bisa dijalankan manual oleh user, atau otomatis lewat app menggunakan `Runtime.getRuntime().exec`.
 

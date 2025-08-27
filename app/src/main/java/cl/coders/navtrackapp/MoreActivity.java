@@ -1,9 +1,9 @@
-package cl.coders.faketraveler;
+package cl.coders.navtrackapp;
 
-import static cl.coders.faketraveler.MainActivity.DECIMAL_FORMAT;
-import static cl.coders.faketraveler.MainActivity.sharedPrefKey;
-import static cl.coders.faketraveler.SharedPrefsUtil.getDouble;
-import static cl.coders.faketraveler.SharedPrefsUtil.putDouble;
+import static cl.coders.navtrackapp.MainActivity.DECIMAL_FORMAT;
+import static cl.coders.navtrackapp.MainActivity.sharedPrefKey;
+import static cl.coders.navtrackapp.SharedPrefsUtil.getDouble;
+import static cl.coders.navtrackapp.SharedPrefsUtil.putDouble;
 
 import android.content.Context;
 import android.content.SharedPreferences;

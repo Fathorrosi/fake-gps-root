@@ -1,4 +1,4 @@
-package cl.coders.faketraveler;
+package cl.coders.navtrackapp;
 
 import java.util.Locale;
 
