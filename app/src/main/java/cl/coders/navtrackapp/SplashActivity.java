@@ -1,9 +1,15 @@
 package cl.coders.navtrackapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,42 +27,72 @@ import okhttp3.Response;
 
 public class SplashActivity extends AppCompatActivity {
 
+    private static final String PREFS_NAME = "AppPrefs";
+    private static final String KEY_TOKEN = "user_token";
+
+    private LinearLayout inputLayout;
+    private ProgressBar progressBar;
+    private EditText tokenInput;
+    private Button submitBtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        String token = "4489eea6c9f348f8ab6858c945e7c0c0";
+        inputLayout = findViewById(R.id.inputLayout);
+        progressBar = findViewById(R.id.progressBar);
+        tokenInput = findViewById(R.id.tokenInput);
+        submitBtn = findViewById(R.id.submitBtn);
 
-        // Ambil deviceId dari Android
-        String deviceId = Settings.Secure.getString(
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        String savedToken = prefs.getString(KEY_TOKEN, null);
+
+        if (savedToken != null) {
+            // Token sudah pernah disimpan → langsung validasi
+            showLoading(true);
+            String deviceId = getAndroidId();
+            checkToken(savedToken, deviceId, false);
+        } else {
+            // Belum ada token → tampilkan input
+            showLoading(false);
+            submitBtn.setOnClickListener(v -> {
+                String token = tokenInput.getText().toString().trim();
+                if (token.isEmpty()) {
+                    Toast.makeText(this, "Token tidak boleh kosong", Toast.LENGTH_SHORT).show();
+                } else {
+                    showLoading(true);
+                    String deviceId = getAndroidId();
+                    checkToken(token, deviceId, true);
+                }
+            });
+        }
+    }
+
+    private String getAndroidId() {
+        return Settings.Secure.getString(
                 getContentResolver(),
                 Settings.Secure.ANDROID_ID
         );
-
-        checkToken(token, deviceId);
     }
 
-    private void checkToken(String token, String deviceId) {
-        OkHttpClient client = new OkHttpClient();
 
-        // URL dengan parameter GET
+    private void checkToken(String token, String deviceId, boolean saveIfValid) {
+        OkHttpClient client = new OkHttpClient();
         String url = "http://thorsi.my.id/api/check_token?token=" + token + "&device_id=" + deviceId;
         Log.d("SplashActivity", "Request URL: " + url);
 
-
         Request request = new Request.Builder()
                 .url(url)
-                .get() // GET request
+                .get()
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                e.printStackTrace(); // tampilkan stacktrace di Logcat
                 runOnUiThread(() -> {
+                    showLoading(false);
                     Toast.makeText(SplashActivity.this, "Gagal cek token", Toast.LENGTH_SHORT).show();
-                    finish();
                 });
             }
 
@@ -70,30 +106,46 @@ public class SplashActivity extends AppCompatActivity {
 
                         runOnUiThread(() -> {
                             if ("valid".equalsIgnoreCase(status)) {
-                                // Token valid → lanjut MainActivity
-                                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                                startActivity(intent);
+                                if (saveIfValid) {
+                                    // simpan token agar tidak ditanya lagi
+                                    getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                                            .edit()
+                                            .putString(KEY_TOKEN, token)
+                                            .apply();
+                                }
+                                // Lanjut MainActivity
+                                startActivity(new Intent(SplashActivity.this, MainActivity.class));
                                 finish();
                             } else {
+                                showLoading(false);
                                 String msg = json.optString("message", "Token tidak valid");
                                 Toast.makeText(SplashActivity.this, msg, Toast.LENGTH_SHORT).show();
-                                finish();
                             }
                         });
 
                     } catch (JSONException e) {
                         runOnUiThread(() -> {
+                            showLoading(false);
                             Toast.makeText(SplashActivity.this, "Format respons tidak sesuai", Toast.LENGTH_SHORT).show();
-                            finish();
                         });
                     }
                 } else {
                     runOnUiThread(() -> {
+                        showLoading(false);
                         Toast.makeText(SplashActivity.this, "Server error: " + response.code(), Toast.LENGTH_SHORT).show();
-                        finish();
                     });
                 }
             }
         });
+    }
+
+    private void showLoading(boolean loading) {
+        if (loading) {
+            inputLayout.setVisibility(LinearLayout.GONE);
+            progressBar.setVisibility(ProgressBar.VISIBLE);
+        } else {
+            inputLayout.setVisibility(LinearLayout.VISIBLE);
+            progressBar.setVisibility(ProgressBar.GONE);
+        }
     }
 }
